@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # RescueNow
 
 RescueNow is a MERN platform for finding and booking verified recovery lorries in Sri Lanka.
@@ -35,3 +36,6 @@ The basic map flow uses browser geolocation and OpenStreetMap-compatible configu
 ## Security and production notes
 
 Use HTTPS, a strong random `JWT_SECRET` and `COOKIE_SECRET`, a specific `CLIENT_URL`, secure cookies, MongoDB network restrictions, and a managed image storage service for uploads. No online payment is claimed: initial payment records are cash and remain pending until an authorized workflow records payment.
+=======
+# Recovery-Lorry
+>>>>>>> 33658053caf805c029bcb83fbe610d1b37bd672e
