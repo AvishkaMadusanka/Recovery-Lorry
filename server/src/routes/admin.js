@@ -1,0 +1,15 @@
+import { Router } from 'express';
+import User from '../models/User.js';
+import Provider from '../models/Provider.js';
+import RecoveryVehicle from '../models/RecoveryVehicle.js';
+import Booking from '../models/Booking.js';
+import Complaint from '../models/Complaint.js';
+import { allowRoles, requireAuth } from '../middleware/auth.js';
+const router = Router();
+router.use(requireAuth, allowRoles('admin'));
+router.get('/dashboard', async (req, res, next) => { try { const [customers, providers, pendingProviders, vehicles, bookings, activeBookings, completedBookings] = await Promise.all([User.countDocuments({ role: 'customer' }), Provider.countDocuments(), Provider.countDocuments({ verificationStatus: 'pending' }), RecoveryVehicle.countDocuments({ isActive: true }), Booking.countDocuments(), Booking.countDocuments({ status: { $in: ['accepted', 'on_the_way', 'arrived', 'in_progress'] } }), Booking.countDocuments({ status: 'completed' })]); res.json({ stats: { customers, providers, pendingProviders, vehicles, bookings, activeBookings, completedBookings } }); } catch (error) { next(error); } });
+router.get('/providers', async (req, res, next) => { try { res.json({ providers: await Provider.find().populate('userId', 'fullName email phone').sort({ createdAt: -1 }) }); } catch (error) { next(error); } });
+router.patch('/providers/:id/:action', async (req, res, next) => { try { if (!['approve', 'reject', 'suspend', 'reactivate'].includes(req.params.action)) return res.status(400).json({ message: 'Unsupported provider action.' }); const verificationStatus = { approve: 'approved', reject: 'rejected', suspend: 'suspended', reactivate: 'approved' }[req.params.action]; const provider = await Provider.findByIdAndUpdate(req.params.id, { verificationStatus }, { new: true }); if (!provider) return res.status(404).json({ message: 'Provider not found.' }); res.json({ provider }); } catch (error) { next(error); } });
+router.get('/bookings', async (req, res, next) => { try { res.json({ bookings: await Booking.find().sort({ createdAt: -1 }).limit(100) }); } catch (error) { next(error); } });
+router.get('/complaints', async (req, res, next) => { try { res.json({ complaints: await Complaint.find().sort({ createdAt: -1 }) }); } catch (error) { next(error); } });
+export default router;

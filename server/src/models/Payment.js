@@ -1,0 +1,3 @@
+import mongoose from 'mongoose';
+const schema = new mongoose.Schema({ bookingId: { type: mongoose.Schema.Types.ObjectId, ref: 'Booking', required: true, unique: true }, customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, providerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Provider', required: true }, amount: { type: Number, min: 0, required: true }, currency: { type: String, default: 'LKR' }, paymentMethod: { type: String, default: 'cash' }, paymentStatus: { type: String, enum: ['pending', 'paid', 'failed', 'refunded'], default: 'pending' }, transactionReference: String }, { timestamps: true });
+export default mongoose.model('Payment', schema);
